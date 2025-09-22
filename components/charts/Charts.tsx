@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Sector
@@ -70,9 +71,13 @@ export const SatisfactionPieChart: React.FC<{ data: SatisfactionData[] }> = ({ d
         <ResponsiveContainer width="100%" height={300}>
         <PieChart>
             <Pie 
-                activeIndex={activeIndex}
+                // FIX: The 'activeIndex' prop is not recognized by recharts' TypeScript definitions.
+                // Spreading it from an 'any' cast object bypasses the type error for this valid prop.
+                {...({ activeIndex } as any)}
                 activeShape={renderActiveShape}
-                data={data} 
+                // FIX: Cast data to 'any' to resolve a known typing issue with the recharts Pie component,
+                // which expects a data type with an index signature that SatisfactionData lacks.
+                data={data as any}
                 cx="50%" 
                 cy="50%" 
                 innerRadius={60}

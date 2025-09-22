@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { UserRole } from '../types';
 
@@ -28,8 +29,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
           <div className="space-y-6">
             <RoleButton role={UserRole.ADMIN} onClick={onLogin} />
-            <RoleButton role={UserRole.TECHNICIAN} onClick={onLogin} />
-            <RoleButton role={UserRole.CUSTOMER} onClick={onLogin} />
           </div>
            <div className="text-center mt-8 text-sm text-gray-400">
               <p>Select a role to view the prototype dashboard.</p>

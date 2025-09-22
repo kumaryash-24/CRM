@@ -150,8 +150,8 @@ const EarningsPage: React.FC = () => (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
             <Card title="Earnings Breakdown">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500">
+                <div>
+                    <table className="w-full text-sm text-left text-gray-500 hidden md:table">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3">Job ID</th><th className="px-6 py-3">Service</th><th className="px-6 py-3">Date</th><th className="px-6 py-3 text-right">Amount</th>
@@ -168,6 +168,18 @@ const EarningsPage: React.FC = () => (
                             ))}
                         </tbody>
                     </table>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                        {technicianEarningsDetails.map((earning) => (
+                            <div key={earning.jobId} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                            <div className="flex justify-between items-start">
+                                <p className="font-bold text-gray-800">{earning.service}</p>
+                                <p className="font-semibold text-teal-600">${earning.amount.toFixed(2)}</p>
+                            </div>
+                            <p className="text-sm text-gray-600">Job ID: {earning.jobId}</p>
+                            <p className="text-xs text-gray-400 pt-1">{earning.date}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </Card>
         </div>

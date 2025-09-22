@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card } from '../components/Card';
-import { adminKpiData, serviceRequestData, revenueByServiceData, customerSatisfactionData, technicianWorkloadData, recentActivity, customersData, techniciansData, customerGrowthData, topTechniciansData, serviceOfferingsData } from '../data/mockData';
-import { KpiCardData, Customer, Technician, Booking, Service } from '../types';
-import { TrendingUp, TrendingDown, Search, Plus, MapPin, Filter } from '../components/icons';
+import { adminKpiData, serviceRequestData, revenueByServiceData, customerSatisfactionData, technicianWorkloadData, recentActivity, customersData, techniciansData, customerGrowthData, topTechniciansData, serviceOfferingsData, bookingsData, technicianRatingsData } from '../data/mockData';
+import { KpiCardData, Customer, Technician, Booking, Service, Rating } from '../types';
+import { TrendingUp, TrendingDown, Search, Plus, MapPin, Filter, ChevronLeft, User as UserIcon, Briefcase, DollarSign, Clock, Star } from '../components/icons';
 import { ServiceRequestChart, RevenueChart, SatisfactionPieChart, TechnicianWorkloadChart } from '../components/charts/Charts';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 
 const KpiCard: React.FC<{ data: KpiCardData }> = ({ data }) => {
@@ -45,7 +45,7 @@ const statusColorMap: { [key: string]: string } = {
 
 const DashboardView: React.FC = () => (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
         {adminKpiData.map(data => <KpiCard key={data.title} data={data} />)}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -69,8 +69,8 @@ const DashboardView: React.FC = () => (
           </Card>
       </div>
       <Card title="Recent Activity">
-          <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-gray-500">
+          <div>
+              <table className="w-full text-sm text-left text-gray-500 hidden md:table">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                       <tr>
                           <th scope="col" className="px-6 py-3">Customer</th>
@@ -92,6 +92,18 @@ const DashboardView: React.FC = () => (
                       ))}
                   </tbody>
               </table>
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                  {recentActivity.map((activity) => (
+                    <div key={activity.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <span className="font-bold text-gray-800">{activity.user}</span>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[activity.status]}`}>{activity.status}</span>
+                      </div>
+                      <p className="text-sm text-gray-600">{activity.service}</p>
+                      <p className="text-xs text-gray-400">{activity.time}</p>
+                    </div>
+                  ))}
+                </div>
           </div>
       </Card>
     </div>
@@ -111,8 +123,8 @@ const AddNewCustomerModal: React.FC<{ onClose: () => void; onAddCustomer: (custo
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-md">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Customer</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -141,7 +153,7 @@ const AddNewCustomerModal: React.FC<{ onClose: () => void; onAddCustomer: (custo
     );
 };
 
-const CustomersPage: React.FC = () => {
+const CustomersPage: React.FC<{ onViewCustomer: (customer: Customer) => void }> = ({ onViewCustomer }) => {
     const [customers, setCustomers] = useState<Customer[]>(customersData);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -206,8 +218,10 @@ const CustomersPage: React.FC = () => {
                     </div>
                 )}
                 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500">
+                {/* Responsive Table/Card View */}
+                <div>
+                    {/* Table for md and up */}
+                    <table className="w-full text-sm text-left text-gray-500 hidden md:table">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3">Name</th><th className="px-6 py-3">Contact</th><th className="px-6 py-3">Address</th><th className="px-6 py-3">Signup Date</th>
@@ -216,7 +230,11 @@ const CustomersPage: React.FC = () => {
                         <tbody>
                             {filteredCustomers.map((customer: Customer) => (
                                 <tr key={customer.id} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4 font-medium text-gray-900">{customer.name}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900">
+                                        <button onClick={() => onViewCustomer(customer)} className="text-blue-600 hover:text-blue-800 hover:underline transition">
+                                            {customer.name}
+                                        </button>
+                                    </td>
                                     <td className="px-6 py-4">
                                         <div>{customer.email}</div>
                                         <div className="text-xs text-gray-500">{customer.phone}</div>
@@ -232,12 +250,287 @@ const CustomersPage: React.FC = () => {
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Cards for screens smaller than md */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                        {filteredCustomers.map((customer: Customer) => (
+                            <div key={customer.id} className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                                <button onClick={() => onViewCustomer(customer)} className="text-blue-600 hover:text-blue-800 font-bold text-lg text-left">
+                                    {customer.name}
+                                </button>
+                                <div className="mt-2 space-y-2 text-sm">
+                                    <p className="text-gray-700">{customer.email}</p>
+                                    <p className="text-gray-500">{customer.phone}</p>
+                                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(customer.address)}`} target="_blank" rel="noopener noreferrer" className="flex items-start text-blue-600 hover:underline pt-1" aria-label={`View ${customer.name}'s address on Google Maps`}>
+                                        <MapPin className="w-4 h-4 mr-2 shrink-0 mt-0.5" />
+                                        <span>{customer.address}</span>
+                                    </a>
+                                    <p className="text-xs text-gray-400 pt-2">Signed up: {customer.signupDate}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
             </Card>
         </>
     );
 };
-const TechniciansPage: React.FC = () => {
+
+const CustomerDetailsPage: React.FC<{ customer: Customer; onBack: () => void; bookings: Booking[] }> = ({ customer, onBack, bookings }) => {
+    const customerBookings = bookings.filter(b => b.customerName === customer.name);
+    const totalSpent = customerBookings.reduce((acc, booking) => {
+        const service = serviceOfferingsData.find(s => s.name === booking.service);
+        return acc + (service?.basePrice || 150);
+    }, 0);
+
+    return (
+        <div className="space-y-6 animate-fade-in">
+            <div>
+                <button onClick={onBack} className="flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900 mb-4 transition">
+                    <ChevronLeft className="w-5 h-5 mr-1" />
+                    Back to All Customers
+                </button>
+                <h2 className="text-3xl font-bold text-gray-800">Customer Details</h2>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 space-y-6">
+                    <Card>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-4 ring-4 ring-blue-200">
+                                <UserIcon className="w-12 h-12 text-blue-500" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800">{customer.name}</h3>
+                            <p className="text-gray-500">{customer.email}</p>
+                            <p className="text-gray-500">{customer.phone}</p>
+                            <p className="text-sm text-gray-400 mt-2">Customer since {customer.signupDate}</p>
+                        </div>
+                    </Card>
+                    <Card title="Location">
+                        <p className="text-gray-600 mb-4">{customer.address}</p>
+                         <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden border">
+                           <iframe
+                                title="Customer Location"
+                                src={`https://maps.google.com/maps?q=${encodeURIComponent(customer.address)}&output=embed`}
+                                width="100%"
+                                height="250"
+                                frameBorder="0"
+                                style={{ border: 0 }}
+                                allowFullScreen={false}
+                                aria-hidden="false"
+                                tabIndex={0}
+                            ></iframe>
+                        </div>
+                    </Card>
+                </div>
+                
+                <div className="lg:col-span-2 space-y-6">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <Card>
+                             <div className="flex items-center">
+                                <div className="p-3 rounded-full mr-4 bg-green-100 text-green-600">
+                                    <Briefcase className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Total Bookings</p>
+                                    <p className="text-2xl font-bold text-gray-800">{customerBookings.length}</p>
+                                </div>
+                            </div>
+                        </Card>
+                         <Card>
+                            <div className="flex items-center">
+                                <div className="p-3 rounded-full mr-4 bg-yellow-100 text-yellow-600">
+                                    <DollarSign className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Total Spent (Est.)</p>
+                                    <p className="text-2xl font-bold text-gray-800">${totalSpent.toFixed(2)}</p>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
+
+                    <Card title="Booking History">
+                        <div className="max-h-96 overflow-y-auto">
+                            <table className="w-full text-sm text-left text-gray-500 hidden md:table">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                                    <tr>
+                                        <th className="px-6 py-3">Service</th>
+                                        <th className="px-6 py-3">Date</th>
+                                        <th className="px-6 py-3">Technician</th>
+                                        <th className="px-6 py-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {customerBookings.length > 0 ? customerBookings.map(booking => (
+                                        <tr key={booking.id} className="bg-white border-b hover:bg-gray-50">
+                                            <td className="px-6 py-4 font-medium text-gray-900">{booking.service}</td>
+                                            <td className="px-6 py-4">{booking.date}</td>
+                                            <td className="px-6 py-4">{booking.technicianName}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[booking.status]}`}>{booking.status}</span>
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr className="hidden md:table-row">
+                                            <td colSpan={4} className="text-center py-8 text-gray-500">No booking history found.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                             <div className="grid grid-cols-1 gap-4 md:hidden">
+                                {customerBookings.length > 0 ? customerBookings.map(booking => (
+                                    <div key={booking.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                                    <div className="flex justify-between items-start">
+                                        <p className="font-bold text-gray-800">{booking.service}</p>
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[booking.status]}`}>{booking.status}</span>
+                                    </div>
+                                    <p className="text-sm text-gray-500">Tech: {booking.technicianName}</p>
+                                    <p className="text-xs text-gray-400 pt-1">{booking.date}</p>
+                                    </div>
+                                )) : (
+                                    <div className="md:hidden text-center py-8 text-gray-500">No booking history found.</div>
+                                )}
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </div>
+             <style>{`
+                @keyframes fade-in {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+            `}</style>
+        </div>
+    );
+};
+
+
+const TechnicianDetailsPage: React.FC<{ 
+    technician: Technician; 
+    onBack: () => void; 
+    bookings: Booking[];
+    ratings: Rating[];
+}> = ({ technician, onBack, bookings, ratings }) => {
+    const technicianBookings = bookings.filter(b => b.technicianName === technician.name);
+    
+    const technicianJobIds = new Set(technicianBookings.map(b => b.id));
+    const technicianRatings = ratings.filter(r => technicianJobIds.has(r.jobId));
+    
+    const jobsCompleted = technicianBookings.filter(b => b.status === 'Completed' || b.status === 'Awaiting Feedback').length;
+    const pendingJobs = technicianBookings.filter(b => b.status === 'Scheduled' || b.status === 'In Progress').length;
+    const totalEarnings = technicianBookings.reduce((acc, booking) => {
+        const service = serviceOfferingsData.find(s => s.name === booking.service);
+        // Using a more realistic earning model, e.g., 80% of service price
+        return acc + ((service?.basePrice || 150) * 0.8);
+    }, 0);
+
+    return (
+        <div className="space-y-6 animate-fade-in">
+            <div>
+                <button onClick={onBack} className="flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900 mb-4 transition">
+                    <ChevronLeft className="w-5 h-5 mr-1" />
+                    Back to All Technicians
+                </button>
+                <h2 className="text-3xl font-bold text-gray-800">Technician Details</h2>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 space-y-6">
+                    <Card>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-24 h-24 rounded-full bg-teal-100 flex items-center justify-center mb-4 ring-4 ring-teal-200">
+                                <Briefcase className="w-12 h-12 text-teal-500" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800">{technician.name}</h3>
+                            <p className="text-gray-500">{technician.specialty}</p>
+                            <span className={`mt-2 px-3 py-1 text-sm font-semibold rounded-full ${statusColorMap[technician.status]}`}>{technician.status}</span>
+                        </div>
+                    </Card>
+                    <Card title="Performance Metrics">
+                        <ul className="space-y-4 text-sm">
+                            <li className="flex justify-between items-center"><span className="text-gray-600">Average Rating</span> <span className="font-bold text-gray-800 flex items-center">{technician.rating.toFixed(1)} <Star className="w-4 h-4 ml-1 text-yellow-400" /></span></li>
+                            <li className="flex justify-between items-center"><span className="text-gray-600">Total Completed Jobs</span> <span className="font-bold text-gray-800">{jobsCompleted}</span></li>
+                            <li className="flex justify-between items-center"><span className="text-gray-600">Pending Jobs</span> <span className="font-bold text-gray-800">{pendingJobs}</span></li>
+                            <li className="flex justify-between items-center"><span className="text-gray-600">Total Earnings (Est.)</span> <span className="font-bold text-gray-800">${totalEarnings.toFixed(2)}</span></li>
+                        </ul>
+                    </Card>
+                </div>
+                
+                <div className="lg:col-span-2 space-y-6">
+                    <Card title="Job History">
+                        <div className="max-h-96 overflow-y-auto">
+                            <table className="w-full text-sm text-left text-gray-500 hidden md:table">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                                    <tr>
+                                        <th className="px-6 py-3">Customer</th>
+                                        <th className="px-6 py-3">Service</th>
+                                        <th className="px-6 py-3">Date</th>
+                                        <th className="px-6 py-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {technicianBookings.length > 0 ? technicianBookings.map(booking => (
+                                        <tr key={booking.id} className="bg-white border-b hover:bg-gray-50">
+                                            <td className="px-6 py-4 font-medium text-gray-900">{booking.customerName}</td>
+                                            <td className="px-6 py-4">{booking.service}</td>
+                                            <td className="px-6 py-4">{booking.date}</td>
+                                            <td className="px-6 py-4"><span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[booking.status]}`}>{booking.status}</span></td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan={4} className="text-center py-8 text-gray-500">No jobs assigned.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                            <div className="grid grid-cols-1 gap-4 md:hidden">
+                                {technicianBookings.length > 0 ? technicianBookings.map(booking => (
+                                    <div key={booking.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                                        <div className="flex justify-between items-start">
+                                            <p className="font-bold text-gray-800">{booking.service}</p>
+                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[booking.status]}`}>{booking.status}</span>
+                                        </div>
+                                        <p className="text-sm text-gray-500">Customer: {booking.customerName}</p>
+                                        <p className="text-xs text-gray-400 pt-1">{booking.date}</p>
+                                    </div>
+                                )) : <div className="text-center py-8 text-gray-500">No jobs assigned.</div>}
+                            </div>
+                        </div>
+                    </Card>
+
+                    <Card title="Customer Feedback">
+                        <div className="max-h-72 overflow-y-auto space-y-4">
+                            {technicianRatings.length > 0 ? technicianRatings.map(rating => (
+                                <div key={rating.id} className="p-4 bg-gray-50 rounded-lg">
+                                    <div className="flex justify-between items-center">
+                                        <p className="font-semibold text-gray-800">{rating.customerName}</p>
+                                        <div className="flex items-center">
+                                            {[...Array(5)].map((_, i) => <Star key={i} className={`w-5 h-5 ${i < rating.rating ? 'text-yellow-400' : 'text-gray-300'}`} />)}
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-2 italic">"{rating.comment}"</p>
+                                    <p className="text-xs text-gray-400 text-right mt-2">{rating.date}</p>
+                                </div>
+                            )) : <p className="text-gray-500 text-center py-4">No feedback received yet.</p>}
+                        </div>
+                    </Card>
+                </div>
+            </div>
+             <style>{`
+                @keyframes fade-in {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+            `}</style>
+        </div>
+    );
+};
+
+
+const TechniciansPage: React.FC<{ onViewTechnician: (technician: Technician) => void }> = ({ onViewTechnician }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const initialFilters = { specialty: '', status: '', rating: '' };
     const [filters, setFilters] = useState(initialFilters);
@@ -297,8 +590,8 @@ const TechniciansPage: React.FC = () => {
                     </div>
                 </div>
             )}
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500">
+            <div>
+                <table className="w-full text-sm text-left text-gray-500 hidden md:table">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th className="px-6 py-3">Name</th><th className="px-6 py-3">Specialty</th><th className="px-6 py-3">Rating</th><th className="px-6 py-3">Jobs Completed</th><th className="px-6 py-3">Status</th>
@@ -307,7 +600,11 @@ const TechniciansPage: React.FC = () => {
                     <tbody>
                         {filteredTechnicians.map((tech: Technician) => (
                             <tr key={tech.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">{tech.name}</td>
+                                <td className="px-6 py-4 font-medium text-gray-900">
+                                     <button onClick={() => onViewTechnician(tech)} className="text-blue-600 hover:text-blue-800 hover:underline transition text-left">
+                                        {tech.name}
+                                    </button>
+                                </td>
                                 <td className="px-6 py-4">{tech.specialty}</td>
                                 <td className="px-6 py-4">{tech.rating.toFixed(1)}</td>
                                 <td className="px-6 py-4">{tech.jobsCompleted}</td>
@@ -316,6 +613,23 @@ const TechniciansPage: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                    {filteredTechnicians.map((tech) => (
+                        <div key={tech.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                            <div className="flex justify-between items-center">
+                                 <button onClick={() => onViewTechnician(tech)} className="font-bold text-gray-800 text-left text-blue-600 hover:text-blue-800 hover:underline transition">
+                                    {tech.name}
+                                </button>
+                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[tech.status]}`}>{tech.status}</span>
+                            </div>
+                            <p className="text-sm text-gray-600">{tech.specialty}</p>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-500">Rating: <span className="font-semibold text-yellow-500">{tech.rating.toFixed(1)} ★</span></span>
+                                <span className="text-gray-500">Jobs: <span className="font-semibold text-gray-700">{tech.jobsCompleted}</span></span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </Card>
     );
@@ -350,7 +664,7 @@ const AssignTaskModal: React.FC<{
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-2xl max-h-full overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-2xl max-h-full overflow-y-auto">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Assign New Task</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -497,8 +811,8 @@ const BookingsPage: React.FC<{ bookings: Booking[], setBookings: React.Dispatch<
                     </div>
                 </div>
             )}
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500">
+            <div>
+                <table className="w-full text-sm text-left text-gray-500 hidden md:table">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th className="px-6 py-3">Customer</th><th className="px-6 py-3">Technician</th><th className="px-6 py-3">Service</th><th className="px-6 py-3">Date</th><th className="px-6 py-3">Status</th>
@@ -516,6 +830,19 @@ const BookingsPage: React.FC<{ bookings: Booking[], setBookings: React.Dispatch<
                         ))}
                     </tbody>
                 </table>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                    {filteredBookings.map((booking) => (
+                        <div key={booking.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                        <div className="flex justify-between items-start">
+                            <p className="font-bold text-gray-800">{booking.customerName}</p>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColorMap[booking.status]}`}>{booking.status}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 font-medium">{booking.service}</p>
+                        <p className="text-sm text-gray-500">Tech: {booking.technicianName}</p>
+                        <p className="text-xs text-gray-400 pt-1">{booking.date} @ {booking.time}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
         </Card>
         </>
@@ -529,14 +856,14 @@ const ServiceOfferingsPage: React.FC = () => (
                 <Plus className="w-5 h-5 mr-2" /> Add New Service
             </button>
         </div>
-        <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500">
+        <div>
+            <table className="w-full text-sm text-left text-gray-500 hidden md:table">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
                         <th className="px-6 py-3">Service Name</th>
                         <th className="px-6 py-3">Category</th>
                         <th className="px-6 py-3">Base Price</th>
-                        <th className="px-6 py-3">Description</th>
+                        <th className="px-6 py-3 hidden lg:table-cell">Description</th>
                         <th className="px-6 py-3 text-center">Actions</th>
                     </tr>
                 </thead>
@@ -546,7 +873,7 @@ const ServiceOfferingsPage: React.FC = () => (
                             <td className="px-6 py-4 font-medium text-gray-900">{service.name}</td>
                             <td className="px-6 py-4">{service.category}</td>
                             <td className="px-6 py-4 font-semibold text-gray-700">${service.basePrice.toFixed(2)}</td>
-                            <td className="px-6 py-4 text-gray-600 max-w-sm">{service.description}</td>
+                            <td className="px-6 py-4 text-gray-600 max-w-sm hidden lg:table-cell">{service.description}</td>
                             <td className="px-6 py-4 flex justify-center space-x-4">
                                 <button className="font-medium text-blue-600 hover:underline">Edit</button>
                                 <button className="font-medium text-red-600 hover:underline">Delete</button>
@@ -555,44 +882,186 @@ const ServiceOfferingsPage: React.FC = () => (
                     ))}
                 </tbody>
             </table>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                {serviceOfferingsData.map((service) => (
+                    <div key={service.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                    <div className="flex justify-between items-start">
+                        <p className="font-bold text-gray-800">{service.name}</p>
+                        <p className="font-semibold text-teal-600">${service.basePrice.toFixed(2)}</p>
+                    </div>
+                    <p className="text-sm text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded-full inline-block">{service.category}</p>
+                    <p className="text-sm text-gray-500 pt-1">{service.description}</p>
+                    <div className="flex justify-end space-x-4 pt-2 border-t mt-2">
+                        <button className="font-medium text-blue-600 hover:underline">Edit</button>
+                        <button className="font-medium text-red-600 hover:underline">Delete</button>
+                    </div>
+                    </div>
+                ))}
+            </div>
         </div>
     </Card>
 );
 
-const AnalyticsPage: React.FC = () => (
+const AnalyticsPage: React.FC = () => {
+    const analyticsData = useMemo(() => {
+        const servicePriceMap = new Map(serviceOfferingsData.map(s => [s.name, s.basePrice]));
+
+        const monthlyRevenue: { [key: string]: number } = {};
+        bookingsData.forEach(booking => {
+            if (booking.status === 'Completed' || booking.status === 'Awaiting Feedback') {
+                const month = new Date(booking.date).toLocaleString('default', { month: 'short' });
+                const price = servicePriceMap.get(booking.service) || 150;
+                monthlyRevenue[month] = (monthlyRevenue[month] || 0) + price;
+            }
+        });
+        const revenueChartData = Object.entries(monthlyRevenue)
+            .map(([name, revenue]) => ({ name, revenue }))
+            .slice(-6);
+
+        const serviceCounts = bookingsData.reduce((acc, booking) => {
+            acc[booking.service] = (acc[booking.service] || 0) + 1;
+            return acc;
+        }, {} as { [key: string]: number });
+        const servicePopularityChartData = Object.entries(serviceCounts)
+            .map(([name, bookings]) => ({ name, bookings }))
+            .sort((a, b) => b.bookings - a.bookings)
+            .slice(0, 5);
+
+        const statusCounts = bookingsData.reduce((acc, booking) => {
+            acc[booking.status] = (acc[booking.status] || 0) + 1;
+            return acc;
+        }, {} as { [key: string]: number });
+        const statusDistributionChartData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
+
+        const completedJobs = (statusCounts['Completed'] || 0) + (statusCounts['Awaiting Feedback'] || 0);
+        const totalRevenue = Object.values(monthlyRevenue).reduce((sum, rev) => sum + rev, 0);
+        const avgJobValue = completedJobs > 0 ? totalRevenue / completedJobs : 0;
+        const pendingJobs = (statusCounts['Scheduled'] || 0) + (statusCounts['In Progress'] || 0);
+
+        return { revenueChartData, servicePopularityChartData, statusDistributionChartData, completedJobs, avgJobValue, pendingJobs, totalRevenue };
+    }, []);
+
+    const COLORS = ['#0ea5e9', '#14b8a6', '#f97316', '#eab308', '#ef4444', '#8b5cf6'];
+    
+    return (
     <div className="space-y-6">
-        <Card title="New Customer Growth">
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={customerGrowthData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="newCustomers" stroke="#0ea5e9" strokeWidth={2} />
-                </LineChart>
-            </ResponsiveContainer>
-        </Card>
-        <Card title="Top 5 Technician Performance (Jobs Completed)">
-            <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topTechniciansData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="jobs" fill="#14b8a6" />
-                </BarChart>
-            </ResponsiveContainer>
-        </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+                <p className="text-sm text-gray-500">Total Revenue</p>
+                <p className="text-3xl font-bold text-gray-800">${analyticsData.totalRevenue.toLocaleString()}</p>
+            </Card>
+            <Card>
+                <p className="text-sm text-gray-500">Avg. Job Value</p>
+                <p className="text-3xl font-bold text-gray-800">${analyticsData.avgJobValue.toFixed(2)}</p>
+            </Card>
+            <Card>
+                <p className="text-sm text-gray-500">Completed Jobs</p>
+                <p className="text-3xl font-bold text-gray-800">{analyticsData.completedJobs}</p>
+            </Card>
+            <Card>
+                <p className="text-sm text-gray-500">Pending Jobs</p>
+                <p className="text-3xl font-bold text-gray-800">{analyticsData.pendingJobs}</p>
+            </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <Card title="Monthly Revenue Trend" className="lg:col-span-3">
+                <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={analyticsData.revenueChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#0ea5e9" strokeWidth={2} />
+                    </LineChart>
+                </ResponsiveContainer>
+            </Card>
+             <Card title="Top 5 Service Popularity" className="lg:col-span-2">
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={analyticsData.servicePopularityChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="bookings" name="Total Bookings" fill="#14b8a6" >
+                            {analyticsData.servicePopularityChartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+            <Card title="Booking Status Distribution">
+                <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                        <Pie
+                            data={analyticsData.statusDistributionChartData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={100}
+                            innerRadius={60}
+                            fill="#8884d8"
+                            dataKey="value"
+                            paddingAngle={2}
+                        >
+                            {analyticsData.statusDistributionChartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ right: 0, lineHeight: '24px' }}/>
+                    </PieChart>
+                </ResponsiveContainer>
+            </Card>
+        </div>
     </div>
-);
+)};
 
 
 export const AdminDashboard: React.FC<{ activePage: string; bookings: Booking[]; setBookings: React.Dispatch<React.SetStateAction<Booking[]>> }> = ({ activePage, bookings, setBookings }) => {
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
+
+    const handleViewCustomer = (customer: Customer) => {
+        setSelectedCustomer(customer);
+    };
+
+    const handleBackToList = () => {
+        setSelectedCustomer(null);
+    };
+
+    const handleViewTechnician = (technician: Technician) => {
+        setSelectedTechnician(technician);
+    };
+
+    const handleBackToTechnicianList = () => {
+        setSelectedTechnician(null);
+    };
+    
+    useEffect(() => {
+        // Reset customer view when navigating to a different page in the sidebar
+        if (activePage !== 'Customers') {
+            setSelectedCustomer(null);
+        }
+        if (activePage !== 'Technicians') {
+            setSelectedTechnician(null);
+        }
+    }, [activePage]);
+
     switch (activePage) {
-        case 'Customers': return <CustomersPage />;
-        case 'Technicians': return <TechniciansPage />;
+        case 'Customers': 
+            return selectedCustomer ? 
+                <CustomerDetailsPage customer={selectedCustomer} onBack={handleBackToList} bookings={bookings} /> : 
+                <CustomersPage onViewCustomer={handleViewCustomer} />;
+        case 'Technicians': 
+            return selectedTechnician ?
+                <TechnicianDetailsPage technician={selectedTechnician} onBack={handleBackToTechnicianList} bookings={bookings} ratings={technicianRatingsData} /> :
+                <TechniciansPage onViewTechnician={handleViewTechnician} />;
         case 'Bookings': return <BookingsPage bookings={bookings} setBookings={setBookings} />;
         case 'Services': return <ServiceOfferingsPage />;
         case 'Analytics': return <AnalyticsPage />;

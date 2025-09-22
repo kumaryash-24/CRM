@@ -1,3 +1,6 @@
+// FIX: Import React to use React types like React.ComponentType.
+import React from 'react';
+
 export enum UserRole {
   ADMIN = 'Admin',
   CUSTOMER = 'Customer',

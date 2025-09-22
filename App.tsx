@@ -87,6 +87,7 @@ const DashboardContent: React.FC<{
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activePage, setActivePage] = useState<string>('Dashboard');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Lifted state
   const [bookings, setBookings] = useState<Booking[]>(bookingsData);
@@ -105,16 +106,27 @@ const App: React.FC = () => {
     setActivePage(page);
   }
 
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  }
+
   if (!currentUser) {
     return <LoginPage onLogin={handleLogin} />;
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar userRole={currentUser.role} onLogout={handleLogout} activePage={activePage} onNavigate={handleNavigate} />
-      <div className="flex-1 flex flex-col overflow-hidden ml-64">
+    <div className="bg-gray-50">
+      <Sidebar 
+        userRole={currentUser.role} 
+        onLogout={handleLogout} 
+        activePage={activePage} 
+        onNavigate={handleNavigate}
+        isCollapsed={isSidebarCollapsed}
+        onToggle={handleToggleSidebar}
+      />
+      <div className={`h-screen flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
         <Header user={currentUser} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-br from-blue-50 to-teal-50/30 p-6">
+        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-blue-50 to-teal-50/30 p-4 sm:p-6">
           <DashboardContent 
             user={currentUser} 
             activePage={activePage}
