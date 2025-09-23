@@ -3,7 +3,7 @@
 import React from 'react';
 import { UserRole } from '../types';
 
-interface LoginPageProps {
+interface LoginPageProps {                   
   onLogin: (role: UserRole) => void;
 }
                   
