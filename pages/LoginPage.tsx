@@ -6,7 +6,7 @@ import { UserRole } from '../types';
 interface LoginPageProps {                   
   onLogin: (role: UserRole) => void;
 }
-                                                                           
+                                                                                                
 const RoleButton: React.FC<{ role: UserRole, onClick: (role: UserRole) => void }> = ({ role, onClick }) => (
   <button
     onClick={() => onClick(role)}
