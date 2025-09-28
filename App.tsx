@@ -7,7 +7,7 @@ import { Header } from './components/Header';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { CustomerDashboard } from './pages/CustomerDashboard';
 import { TechnicianDashboard } from './pages/TechnicianDashboard';
-import { Card } from './components/Card';
+import { Card } from './components/Card';                
 
 const SettingsPage: React.FC = () => (
     <Card title="Settings">
