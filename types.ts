@@ -7,7 +7,7 @@ export enum UserRole {
   TECHNICIAN = 'Technician',
 }        
 
-export interface User {
+export interface User {   
   name: string;
   role: UserRole;
   avatarUrl: string;
