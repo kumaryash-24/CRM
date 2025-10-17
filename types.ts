@@ -3,7 +3,7 @@ import React from 'react';
 
 export enum UserRole {     
   ADMIN = 'Admin',
-  CUSTOMER = 'Customer',
+  CUSTOMER = 'Customer',    
   TECHNICIAN = 'Technician',
 }        
 
