@@ -8,7 +8,7 @@ export enum UserRole {
 }        
 
 export interface User {   
-  name: string;
+  
   role: UserRole;
   avatarUrl: string;
 }
