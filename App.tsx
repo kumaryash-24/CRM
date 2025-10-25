@@ -7,7 +7,7 @@ import { Header } from './components/Header';
 import { AdminDashboard } from './pages/AdminDashboard                                  
 import { CustomerDashboard } from './pages/CustomerDashboard';     
 import { TechnicianDashboard } from './pages/TechnicianDashboard';                           
-
+  
 const SettingsPage: React.FC = () => (
     <Card title="Settings">                    
         <div className="space-y-6">
