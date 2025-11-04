@@ -5,7 +5,7 @@ import { LoginPage } from './pages/LoginPage';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';                       
 import { AdminDashboard } from './pages/AdminDashboard                                      
-import { CustomerDashboard } from './pages/CustomerDashboard';      
+import { CustomerDashboard } from './pages/CustomerDashboard';         
 import { TechnicianDashboard } from './pages/TechnicianDashboard';                                 
   
 const SettingsPage: React.FC = () => (
