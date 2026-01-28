@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserRole, User, Booking, Rating } from './types';
-import { users, bookingsData, technicianRatingsData } from './data/mockData' ;  
+import { users, bookingsData, technicianRatingsData } from './data/mockData' ;    
 import { LoginPage } from './pages/LoginPage';  
 import { Sidebar } from './components/Sidebar'        ;                    
 import { Header } from './components/Header';                                               
