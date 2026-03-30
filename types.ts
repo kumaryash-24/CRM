@@ -6,7 +6,7 @@ export enum UserRole {
   CUSTOMER = 'Customer',    
   TECHNICIAN = 'Technician',
 }        
-
+          
 export interface User {   
   
   role: UserRole;
