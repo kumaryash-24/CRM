@@ -7,7 +7,7 @@ export const users: Record<UserRole, User> = {
   [UserRole.TECHNICIAN]: { name: 'Vijay Nair', role: UserRole.TECHNICIAN, avatarUrl: 'https://i.pravatar.cc/150?u=tech' },
 };
 
-export const adminKpiData: KpiCardData[] = [
+export const adminKpiData: KpiCardData[] = [    
   { title: 'Total Customers', value: '1,254', change: '+12.5%', changeType: 'increase', icon: Users },
   { title: 'Active Technicians', value: '78', change: '+5.2%', changeType: 'increase', icon: UserCheck },
   { title: 'Today\'s Bookings', value: '112', change: '-3.1%', changeType: 'decrease', icon: Calendar },
