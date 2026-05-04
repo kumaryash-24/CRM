@@ -9,7 +9,7 @@ export const users: Record<UserRole, User> = {
 
 export const adminKpiData: KpiCardData[] = [      
   { title: 'Total Customers', value: '1,254', change: '+12.5%', changeType: 'increase', icon: Users },   
-  { title: 'Active Technicians', value: '78', change: '+5.2%', changeType: 'increase', icon: UserCheck },
+  { title: 'Active Technicians', value: '78', change: '+5.2%', changeType: 'increase', icon: UserCheck },  
   { title: 'Today\'s Bookings', value: '112', change: '-3.1%', changeType: 'decrease', icon: Calendar },
   { title: 'Total Revenue', value: '$89,430', change: '+8.7%', changeType: 'increase', icon: DollarSign },
 ];
