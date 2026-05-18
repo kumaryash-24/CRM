@@ -7,7 +7,7 @@ import { ServiceRequestChart, RevenueChart, SatisfactionPieChart, TechnicianWork
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 
-const KpiCard: React.FC<{ data: KpiCardData }> = ({ data }) => {
+const KpiCard: React.FC<{ data: KpiCardData }> = ({ data }) => {  
     const { title, value, change, changeType, icon: Icon } = data;
     const isIncrease = changeType === 'increase';
     return (
