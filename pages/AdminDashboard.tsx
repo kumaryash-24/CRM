@@ -9,7 +9,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 
 const KpiCard: React.FC<{ data: KpiCardData }> = ({ data }) => {  
     const { title, value, change, changeType, icon: Icon } = data;
-    const isIncrease = changeType === 'increase';
+    const isIncrease = changeType === 'increase';     
     return (
         <Card className="flex-1 min-w-[220px]">
             <div className="flex items-center">
