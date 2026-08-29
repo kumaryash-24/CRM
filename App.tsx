@@ -9,7 +9,7 @@ import { CustomerDashboard } from './pages/CustomerDashboard';
 import { TechnicianDashboard } from './pages/TechnicianDashboard';                                            
   
 const SettingsPage: React.FC = () => (   
-    <Card title="Settings">                    
+    <Card title="Settings">                       
         <div className="space-y-6">   
             <div>
                 <h4 className="text-lg font-semibold text-gray-800 mb-2">Notification Preferences</h4>
